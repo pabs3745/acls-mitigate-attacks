@@ -15,9 +15,7 @@ Access to routers R1, R2, and R3 should only be permitted from PC-C, the managem
 
 Standard operating procedure is to apply ACLs on edge routers to mitigate common threats based on source and destination IP address. In this activity, you will create ACLs on edge routers R1 and R3 to achieve this goal. You will then verify ACL functionality from internal and external hosts.
 
-![Topoloy](2023-07-10 16_44_03-Cisco Packet Tracer.png)
 ![2023-07-10 16_44_03-Cisco Packet Tracer](https://github.com/pabs3745/acls-mitigate-attacks/assets/86240130/29648528-04cd-4e45-b2e9-c07e15c583eb)
-https://github.com/pabs3745/acls-mitigate-attacks/blob/master/2023-07-10%2016_44_03-Cisco%20Packet%20Tracer.png
 
 ## IP addressing scheme
 
@@ -46,7 +44,7 @@ o IP addressing
 o Static routing
 
 ## Part 2
-## Secure Access to Routers
+### Secure Access to Routers
 
 ### Step 1: Configure ACL 10 to block all remote access to the routers except from PC-C.
 Use the `access-list` command to create a numbered IP ACL on R1, R2, and R3.
@@ -63,16 +61,19 @@ R1(config-line)# access-class 10 in
 R2(config-line)# access-class 10 in
 R3(config-line)# access-class 10 in
 
-## Step 3: Verify exclusive access from management station PC-C.
+### Step 3: Verify exclusive access from management station PC-C.
 
 a. Establish an SSH session to 192.168.2.1 from PC-C (should be successful).
 
 PC> ssh –l SSHadmin 192.168.2.1
 
+![ssh](ssh1.png)
 
-b. Establish an SSH session to 192.168.2.1 from PC-A (should fail).
+b. Establish an SSH session to 192.168.2.1 from the server (should fail).
 
-## Create a Numbered IP ACL 120 on R1
+![ssh](ssh2.png)
+
+### Create a Numbered IP ACL 120 on R1
 
 Create an IP ACL numbered 120 with the following rules:
 - Permit any outside host to access DNS, SMTP, and FTP services on server PC-A.
@@ -80,11 +81,13 @@ Create an IP ACL numbered 120 with the following rules:
 - Permit PC-C to access R1 via SSH.
 
 ## Part 3
-## 1
+### 1
 
-Be sure to disable HTTP and enable HTTPS on server PC-A.
+Be sure to disable HTTP and enable HTTPS on server.
 
-## 2 
+
+
+### 2 
 
 Use the `access-list` command to create a numbered IP ACL.
 
@@ -95,7 +98,7 @@ R1(config)# access-list 120 deny tcp any host 192.168.1.3 eq 443
 R1(config)# access-list 120 permit tcp host 192.168.3.3 host 10.1.1.1 eq 22
 
 
-## 3 
+### 3 
 
 Apply the ACL to interface S0/0/0.
 
@@ -105,9 +108,91 @@ R1(config)# interface s0/0/0
 R1(config-if)# ip access-group 120 in
 
 
-## 4 
+### 4 
 
-Verify that PC-C cannot access PC-A via HTTPS using the web browser.
+Verify that PC-C cannot access server via HTTPS using the web browser.
+
+
+## Part 4: Modify an Existing ACL on R1
+
+Permit ICMP echo replies and destination unreachable messages from the outside network (relative to R1).
+Deny all other incoming ICMP packets.
+
+### Step 1: Verify that PC-A cannot successfully ping the loopback interface on R2.
+
+### Step 2: Make any necessary changes to ACL 120 to permit and deny the specified traffic.
+
+Use the `access-list` command to create a numbered IP ACL.
+
+R1(config)# access-list 120 permit icmp any any echo-reply
+R1(config)# access-list 120 permit icmp any any unreachable
+R1(config)# access-list 120 deny icmp any any
+R1(config)# access-list 120 permit ip any any
+
+### Step 3: Verify that PC-A can successfully ping the loopback interface on R2.
+
+After making the necessary changes to ACL 120, verify that PC-A can successfully ping the loopback interface on R2.
+
+
+## Part 5: Create a Numbered IP ACL 110 on R3
+
+Deny all outbound packets with source address outside the range of internal IP addresses on R3.
+
+### Step 1: Configure ACL 110 to permit only traffic from the inside network.
+
+Use the `access-list` command to create a numbered IP ACL.
+
+R3(config)# access-list 110 permit ip 192.168.3.0 0.0.0.255 any
+
+
+### Step 2: Apply the ACL to interface G0/1.
+
+Use the `ip access-group` command to apply the access list to incoming traffic on interface G0/1.
+
+
+R3(config)# interface g0/1
+R3(config-if)# ip access-group 110 in
+
+
+## Part 6: Create a Numbered IP ACL 100 on R3
+
+On R3, block all packets containing the source IP address from the following pool of addresses: any RFC
+1918 private addresses, 127.0.0.0/8, and any IP multicast address. Since PC-C is being used for remote
+administration, permit SSH traffic from the 10.0.0.0/8 network to return to the host PC-C.
+
+### Step 1: Configure ACL 100 to block all specified traffic from the outside network.
+
+You should also block traffic sourced from your own internal address space if it is not an RFC 1918 address.
+In this activity, your internal address space is part of the private address space specified in RFC 1918.
+
+Use the `access-list` command to create a numbered IP ACL.
+
+
+R3(config)# access-list 100 permit tcp 10.0.0.0 0.255.255.255 eq 22 host 192.168.3.3
+R3(config)# access-list 100 deny ip 10.0.0.0 0.255.255.255 any
+R3(config)# access-list 100 deny ip 172.16.0.0 0.15.255.255 any
+R3(config)# access-list 100 deny ip 192.168.0.0 0.0.255.255 any
+R3(config)# access-list 100 deny ip 127.0.0.0 0.255.255.255 any
+R3(config)# access-list 100 deny ip 224.0.0.0 15.255.255.255 any
+R3(config)# access-list 100 permit ip any any
+
+
+### Step 2: Apply the ACL to interface Serial 0/0/1.
+
+Use the `ip access-group` command to apply the access list to incoming traffic on interface Serial 0/0/1.
+
+
+R3(config)# interface s0/0/1
+R3(config-if)# ip access-group 100 in
+
+
+### Step 3: Confirm that the specified traffic entering interface Serial 0/0/1 is handled correctly.
+
+a. From the PC-C command prompt, ping the PC-A server. The ICMP echo replies are blocked by the ACL
+since they are sourced from the 192.168.0.0/16 address space.
+
+b. Establish an SSH session to 192.168.2.1 from PC-C (should be successful).
+
 
 
 
