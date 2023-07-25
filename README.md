@@ -85,7 +85,7 @@ Create an IP ACL numbered 120 with the following rules:
 
 Be sure to disable HTTP and enable HTTPS on server.
 
-
+https://github.com/pabs3745/acls-mitigate-attacks/blob/master/server1.png
 
 ### 2 
 
@@ -112,6 +112,7 @@ R1(config-if)# ip access-group 120 in
 
 Verify that PC-C cannot access server via HTTPS using the web browser.
 
+https://github.com/pabs3745/acls-mitigate-attacks/blob/master/https.png
 
 ## Part 4: Modify an Existing ACL on R1
 
@@ -132,6 +133,8 @@ R1(config)# access-list 120 permit ip any any
 ### Step 3: Verify that PC-A can successfully ping the loopback interface on R2.
 
 After making the necessary changes to ACL 120, verify that PC-A can successfully ping the loopback interface on R2.
+
+https://github.com/pabs3745/acls-mitigate-attacks/blob/master/ping1.png
 
 
 ## Part 5: Create a Numbered IP ACL 110 on R3
@@ -188,10 +191,14 @@ R3(config-if)# ip access-group 100 in
 
 ### Step 3: Confirm that the specified traffic entering interface Serial 0/0/1 is handled correctly.
 
-a. From the PC-C command prompt, ping the PC-A server. The ICMP echo replies are blocked by the ACL
+a. From the server command prompt, ping the PC-A server. The ICMP echo replies are blocked by the ACL
 since they are sourced from the 192.168.0.0/16 address space.
 
+https://github.com/pabs3745/acls-mitigate-attacks/blob/master/ping3.png
+
 b. Establish an SSH session to 192.168.2.1 from PC-C (should be successful).
+
+https://github.com/pabs3745/acls-mitigate-attacks/blob/master/ssh3.png
 
 
 
