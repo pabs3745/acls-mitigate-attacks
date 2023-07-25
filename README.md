@@ -16,7 +16,8 @@ Access to routers R1, R2, and R3 should only be permitted from PC-C, the managem
 Standard operating procedure is to apply ACLs on edge routers to mitigate common threats based on source and destination IP address. In this activity, you will create ACLs on edge routers R1 and R3 to achieve this goal. You will then verify ACL functionality from internal and external hosts.
 
 ![Topoloy](2023-07-10 16_44_03-Cisco Packet Tracer.png)
-
+![2023-07-10 16_44_03-Cisco Packet Tracer](https://github.com/pabs3745/acls-mitigate-attacks/assets/86240130/29648528-04cd-4e45-b2e9-c07e15c583eb)
+https://github.com/pabs3745/acls-mitigate-attacks/blob/master/2023-07-10%2016_44_03-Cisco%20Packet%20Tracer.png
 
 ## IP addressing scheme
 
